@@ -283,6 +283,7 @@ class Game {
         console.log("Place your ships on the board");
         this.printOpenMap(map);
         console.log("Please place the first piece of your first ship.");
+        map.setFirstPieceOnBoard(this.map1);
         // Implement your ship placement logic here
     }
 
