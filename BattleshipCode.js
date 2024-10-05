@@ -11,6 +11,7 @@ class Piece {
 
     setYCoord(y) {
         this.yCoord = y;
+        "testing testing"
     }
 
     getYCoord() {
