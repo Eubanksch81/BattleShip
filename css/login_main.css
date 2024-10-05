@@ -1,0 +1,90 @@
+body {
+    font-size: 22px;
+    background-image: url("../imgs/water_back.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style-type: none;
+    opacity: 100%;
+}
+
+#boxTitle {
+    margin-left: 45%;
+    opacity: 100%;
+}
+
+img {
+    opacity: 1;
+    margin-left: 210px;
+    max-width: 200px;
+    max-height: 400px;
+}
+
+div#loginBox {
+    margin: 10vh 0 0 50vh;
+    width: 40%;
+    height: 45vh;
+    background-color: silver;
+    opacity: 60%;
+    border: 2px solid lightseagreen;
+    border-radius: 25px;
+    padding: 40px;
+}
+
+@media screen and (max-width: 750px) {
+    div#loginBox {
+        margin-left: 2vh;
+    }
+    input {
+        float: left;
+        margin: 0;
+        padding: 0;
+        display: block;
+    }
+    a {
+        float: left;
+    }
+}
+
+a {
+    border: 2px solid blue;
+    text-decoration: none;
+    color: black;
+    margin-left: 42%;
+    padding: 10px 20px 10px 20px;
+    opacity: 100%;
+}
+
+a#forgotpass {
+    font-size: 0.9rem;
+    margin: 0 0 0 35%;
+    position: relative;
+    top: 5px;
+    color: blue;
+    border: none;
+}
+
+input {
+    display: block;
+    border: 0;
+    margin-left: 32.5%;
+    opacity: 100%;
+}
+input:focus-visible {
+    outline: none;
+}
+
+input#check {
+    margin-top: 15px;
+    display: inline;
+}
+
+.boxText {
+    margin-left: 40%;
+    opacity: 100%;
+}
