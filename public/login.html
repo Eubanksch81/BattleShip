@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battleship Login</title>
+    <link rel="stylesheet" href="css/login_main.css">
+</head>
+<body>
+<header>
+    <h2 class="gradient-text">Battle Ship</h2>
+</header>
+<div id="loginBox">
+    <span class="logo">
+        <img src="imgs/battleship.webp" alt="BattleShip">
+    </span>
+    <form class="form-container" id="loginForm">
+        <div class="input-group">
+            <label class="boxText" for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="input-group">
+            <label class="boxText" for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="actions">
+            <a id="createAccount" href="createLogin.html">Create Account</a>
+            <a id="forgotpass" href="forgotpass.html">Forgot Password</a>
+        </div>
+        <div class="input-group remember-me">
+            <input id="check" type="checkbox">
+            <label for="check">Remember Me</label>
+        </div>
+        <h2 id="error-message" class="error"></h2>
+        <button id="submitButton" type="submit"><b>Login</b></button>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="loginPage.js"></script>
+</body>
+</html>
