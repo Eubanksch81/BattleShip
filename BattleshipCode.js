@@ -249,59 +249,5 @@ class Game {
         this.gameContinues = true;
     }
 
-    start() {
-        console.log("Welcome to Battleship!\n");
-        this.placeShips(this.map1);
-        this.printOpenMap(this.map1);
 
-        console.log("Now for player 2!\n");
-        this.placeShips(this.map2);
-        this.printOpenMap(this.map2);
-
-        console.log("Starting Player 1!");
-        while (this.gameContinues) {
-            console.log("\nPlayer 1");
-            this.playTurn(this.map2);
-            this.gameContinues = this.checkWin(this.map2);
-            if (!this.gameContinues) {
-                console.log("Player 1 wins!");
-                break;
-            }
-
-            console.log("\nPlayer 2");
-            this.playTurn(this.map1);
-            this.gameContinues = this.checkWin(this.map1);
-            if (!this.gameContinues) {
-                console.log("Player 2 wins!");
-                break;
-            }
-        }
-    }
-
-    placeShips(map) {
-        // Placeholder for ship placement logic
-        console.log("Place your ships on the board");
-        this.printOpenMap(map);
-        console.log("Please place the first piece of your first ship.");
-        map.setFirstPieceOnBoard(this.map1);
-        // Implement your ship placement logic here
-    }
-
-    printOpenMap(map) {
-        console.log(map.toString());
-    }
-
-    playTurn(opponentMap) {
-        // Placeholder for turn logic
-        console.log("Take your shot!");
-        // Implement your turn logic here
-    }
-
-    checkWin(map) {
-        return map.checkWin();
-    }
 }
-
-// Start the game
-const game = new Game();
-game.start();
