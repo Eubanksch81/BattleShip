@@ -116,52 +116,69 @@ class BattleMap {
         return false;
     }
 
-    setOtherPiecesOnBoard(shipNum, xCoord, yCoord) {
-        if (this.#gameBoard[xCoord][yCoord] === 3) {
+    setOtherPiecesOnBoard(shipNum, direction, xCoord, yCoord) {
+        if (this.isValidCoords(xCoord, yCoord + this.#ships[shipNum].getLength()) && this.#gameBoard[xCoord][yCoord] === 3) {
             const initialX = this.#ships[shipNum].getPieceXCoord(0);
             const initialY = this.#ships[shipNum].getPieceYCoord(0);
             this.removePotentialPieces(this.#ships[shipNum].getLength(), initialX, initialY);
+
             this.#gameBoard[xCoord][yCoord] = 1;
             this.#ships[shipNum].setPieceLocation(this.#ships[shipNum].getLength() - 1, xCoord, yCoord);
 
-            if (initialX === xCoord) {
+            if (direction === 1) { //Up
                 for (let i = 0; i < this.#ships[shipNum].getLength(); i++) {
-                    this.#gameBoard[xCoord][yCoord + (initialY < yCoord ? -i : i)] = 1;
-                    this.#ships[shipNum].setPieceLocation(i, xCoord, yCoord + (initialY < yCoord ? -i : i));
+                    this.#gameBoard[initialX][initialY + i] = 1;
+                    this.#ships[shipNum].setPieceLocation(i, initialX, initialY + i);
                 }
-            } else {
+            }
+            else if (direction === 2) { //Left
                 for (let i = 0; i < this.#ships[shipNum].getLength(); i++) {
-                    this.#gameBoard[xCoord + (initialX < xCoord ? -i : i)][yCoord] = 1;
-                    this.#ships[shipNum].setPieceLocation(i, xCoord + (initialX < xCoord ? -i : i), yCoord);
+                    this.#gameBoard[initialX - i][initialY] = 1;
+                    this.#ships[shipNum].setPieceLocation(i, initialX - i, initialY);
                 }
+            }
+            else if (direction === 3) { //Right
+                for (let i = 0; i < this.#ships[shipNum].getLength(); i++) {
+                    this.#gameBoard[initialX + i][initialY] = 1;
+                    this.#ships[shipNum].setPieceLocation(i, initialX + i, initialY);
+                }
+            }
+            else if (direction === 4) { //Down
+                for (let i = 0; i < this.#ships[shipNum].getLength(); i++) {
+                    this.#gameBoard[initialX][initialY - i] = 1;
+                    this.#ships[shipNum].setPieceLocation(i, initialX, initialY - i);
+                }
+            }
+            else {
+                return false;
             }
             return true;
         }
         return false;
     }
 
-    updateHitOrMiss(xCoord, yCoord) {
-        if (this.#gameBoard[xCoord][yCoord] === 0) {
-            this.#gameBoard[xCoord][yCoord] = 4; // Miss
-        } else if (this.#gameBoard[xCoord][yCoord] === 1) {
-            this.#gameBoard[xCoord][yCoord] = 2; // Hit
-            this.hitPiece(xCoord, yCoord);
-        }
-    }
+    // updateHitOrMiss(xCoord, yCoord) {
+    //     if (this.#gameBoard[xCoord][yCoord] === 0) {
+    //         this.#gameBoard[xCoord][yCoord] = 4; // Miss
+    //     } else if (this.#gameBoard[xCoord][yCoord] === 1) {
+    //         this.#gameBoard[xCoord][yCoord] = 2; // Hit
+    //         this.hitPiece(xCoord, yCoord);
+    //     }
+    // }
+    //
+    // hitPiece(xCoord, yCoord) {
+    //     for (const ship of this.#ships) {
+    //         for (let j = 0; j < ship.getLength(); j++) {
+    //             if (ship.getPieceXCoord(j) === xCoord && ship.getPieceYCoord(j) === yCoord) {
+    //                 ship.hitPiece(j);
+    //             }
+    //         }
+    //     }
+    // }
 
-    hitPiece(xCoord, yCoord) {
-        for (const ship of this.#ships) {
-            for (let j = 0; j < ship.getLength(); j++) {
-                if (ship.getPieceXCoord(j) === xCoord && ship.getPieceYCoord(j) === yCoord) {
-                    ship.hitPiece(j);
-                }
-            }
-        }
-    }
-
-    checkWin() {
-        return this.#ships.some(ship => ship.getLength().some((_, j) => !ship.isPieceHit(j)));
-    }
+    // checkWin() {
+    //     return this.#ships.some(ship => ship.getLength().some((_, j) => !ship.isPieceHit(j)));
+    // }
 
     removePotentialPieces(length, xCoord, yCoord) {
         if (xCoord + (length - 1) < 10 && this.#gameBoard[xCoord + (length - 1)][yCoord] === 3) {
@@ -218,36 +235,88 @@ class BattleMap {
         return toReturn;
     }
 
-    getClosedMap() {
-        let toReturn = '  A B C D E F G H I J\n';
-        for (let i = 0; i < 10; i++) {
-            toReturn += i + ' ';
-            for (let j = 0; j < 10; j++) {
-                switch (this.#gameBoard[j][i]) {
-                    case 0:
-                    case 1:
-                        toReturn += '□ ';
-                        break;
-                    case 2:
-                        toReturn += 'X ';
-                        break;
-                    case 4:
-                        toReturn += 'O ';
-                        break;
-                }
-            }
-            toReturn += '\n';
-        }
-        return toReturn;
-    }
+    // getClosedMap() {
+    //     let toReturn = '  A B C D E F G H I J\n';
+    //     for (let i = 0; i < 10; i++) {
+    //         toReturn += i + ' ';
+    //         for (let j = 0; j < 10; j++) {
+    //             switch (this.#gameBoard[j][i]) {
+    //                 case 0:
+    //                 case 1:
+    //                     toReturn += '□ ';
+    //                     break;
+    //                 case 2:
+    //                     toReturn += 'X ';
+    //                     break;
+    //                 case 4:
+    //                     toReturn += 'O ';
+    //                     break;
+    //             }
+    //         }
+    //         toReturn += '\n';
+    //     }
+    //     return toReturn;
+    // }
 }
 
 class Game {
     constructor() {
         this.map1 = new BattleMap();
         this.map2 = new BattleMap();
-        this.gameContinues = true;
+        this.start();
     }
 
+    start() {
+        this.placeShips(this.map1);
+        this.placeShips(this.map2);
 
+        // console.log("Starting Player 1!");
+        // while (this.gameContinues) {
+        //     console.log("\nPlayer 1");
+        //     this.playTurn(this.map2);
+        //     this.gameContinues = this.checkWin(this.map2);
+        //     if (!this.gameContinues) {
+        //         console.log("Player 1 wins!");
+        //         break;
+        //     }
+        //
+        //     console.log("\nPlayer 2");
+        //     this.playTurn(this.map1);
+        //     this.gameContinues = this.checkWin(this.map1);
+        //     if (!this.gameContinues) {
+        //         console.log("Player 2 wins!");
+        //         break;
+        //     }
+        // }
+    }
+
+    placeShips(map) {
+        for (let i = 0; i < 5; ++i) { //i is the ship number
+            let xCoord = Math.random(1, 10);
+            let yCoord = Math.random(1, 10);
+            while (!map.setFirstPieceOnBoard(i, xCoord, yCoord)) {
+                xCoord = Math.random(1, 10);
+                yCoord = Math.random(1, 10);
+            }
+
+            let direction = Math.random(1, 4);
+            while (!map.setOtherPiecesOnBoard(i, direction, xCoord, yCoord)) {
+                direction = Math.random(1, 4);
+            }
+        }
+    }
+
+    // printOpenMap(map) {
+    //     console.log(map.toString());
+    // }
+    //
+    // playTurn(opponentMap) {
+    //     // Placeholder for turn logic
+    //     console.log("Take your shot!");
+    //     // Implement your turn logic here
+    // }
+    //
+    // checkWin(map) {
+    //     return map.checkWin();
+    // }
 }
