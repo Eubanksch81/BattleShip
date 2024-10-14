@@ -3,8 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>BattleShip Login</title>
+    <link rel="stylesheet" href="css/create_login.css">
 </head>
 <body>
-
+    <div id="createBox">
+        <form class="form-container" id="createForm">
+            <div class="input-group">
+                <label class="boxText" for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label class="boxText" for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="input-group">
+                <label class="boxText" for="reenterpassword">Confirm Password:</label>
+                <input type="password" id="reenterpassword" name="reenterpassword" required>
+            </div>
+            <div class="actions">
+                <a href="login.html">Login Page</a>
+            </div>
+            <h2 id="error-message" class="error"></h2>
+            <button id="submitButton" type="submit"><b>Create Account</b></button>
+        </form>
+    </div>
 </body>
 </html>
