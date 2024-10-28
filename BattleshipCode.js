@@ -312,9 +312,16 @@ window.onload = function() {
     let shipsPlaced = false;
     console.log("Code online!");
 
+<<<<<<< HEAD
     const button1 = document.querySelector("button"); //0-0
     button1.addEventListener("click", game.placeShip);
 
     const button2 = document.querySelector("button"); //0-1
+=======
+    const button1 = document.querySelector("#A1"); //0-0
+    button1.addEventListener("click", game.placeShip);
+
+    const button2 = document.querySelector("#A2"); //0-1
+>>>>>>> 5161d010da70cec4778f06ecc882bd08e02952bf
     button2.addEventListener("click", game.placeShip);
 };
