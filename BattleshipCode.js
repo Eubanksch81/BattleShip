@@ -267,30 +267,14 @@ class Game {
     }
 
     start() {
-        this.placeShips(this.map1);
-        this.placeShips(this.map2);
-
-        // console.log("Starting Player 1!");
-        // while (this.gameContinues) {
-        //     console.log("\nPlayer 1");
-        //     this.playTurn(this.map2);
-        //     this.gameContinues = this.checkWin(this.map2);
-        //     if (!this.gameContinues) {
-        //         console.log("Player 1 wins!");
-        //         break;
-        //     }
-        //
-        //     console.log("\nPlayer 2");
-        //     this.playTurn(this.map1);
-        //     this.gameContinues = this.checkWin(this.map1);
-        //     if (!this.gameContinues) {
-        //         console.log("Player 2 wins!");
-        //         break;
-        //     }
-        // }
+        console.log("Game called!");
     }
 
-    placeShips(map) {
+    placeShip() {
+        console.log('working!');
+    }
+
+    placeBotShips(map) {
         for (let i = 0; i < 5; ++i) { //i is the ship number
             let xCoord = Math.random(1, 10);
             let yCoord = Math.random(1, 10);
@@ -320,3 +304,17 @@ class Game {
     //     return map.checkWin();
     // }
 }
+
+window.onload = function() {
+    console.log("Load");
+    const game = new Game();
+    game.placeShip();
+    let shipsPlaced = false;
+    console.log("Code online!");
+
+    const button1 = document.querySelector("button#1"); //0-0
+    button1.addEventListener("click", game.placeShip());
+
+    const button2 = document.querySelector("button#2"); //0-0
+    button2.addEventListener("click", game.placeShip());
+};
