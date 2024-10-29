@@ -46,14 +46,13 @@ div.mainCoords {
 }
 
 .boxElement {
-    padding: 15px;
-    text-align: center;
-}
-
-button.boxElement {
     text-align: center;
     background-color: gold;
     border: 1px solid black;
+}
+.exBoxElement{
+    padding: 15px;
+    text-align: center;
 }
 
 @media screen and (max-width: 1110px) {
