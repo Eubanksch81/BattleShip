@@ -4,7 +4,7 @@ window.onload = function() {
 
     for (let m = 1; m < 3; ++m) {
         for (let i = 0; i < 10; i++) { //Populates Main arrays. i is x, y is j.
-            for (let j = 1; j < 11; ++j) {
+            for (let j = 0; j < 10; ++j) {
                 let iValue = i + 65;
                 let idName = m.toString() + String.fromCharCode(iValue) + j.toString();
                 // console.log(idName);
@@ -23,6 +23,9 @@ window.onload = function() {
 
     let map2 = new BattleMap(2);
     map2.placeRandomShips();
+
+    let map1 = new BattleMap(1);
+    map1.placeRandomShips();
 
 };
 
@@ -63,62 +66,240 @@ class BattleMap {
 
     placeRandomShips() {
         for (let i = 0; i < 5; ++i) {
-            let xCoord = Math.floor(Math.random() * 10);
-            let xLetter = xCoord = String.fromCharCode((xCoord + 65));
-            let yCoord = Math.floor(Math.random() * 10) + 1;
+            let xCoord = Math.floor(Math.random() * 10); //0-9
+            let xLetter = String.fromCharCode((xCoord + 65)); //A - J
+            let yCoord = Math.floor(Math.random() * 10); //0-9 NOTE: Must add 1 when putting to ID.
             let coordHTMLButton;
-            console.log(`${xCoord}, ${yCoord}`);
+            let id;
+            //let numAttempts = 0; //DEBUGGING ONLY
 
-            // this.#ships[i].setPieceLocation(i, xCoord, yCoord);
-            // this.#gameBoard[xCoord][yCoord - 1] = 1;
+            console.log(xCoord + ", " + yCoord);
+            let isValid = this.isValidCoords(xCoord, yCoord);
+            while(!isValid) { //Input validation of random coordinates
+                console.log("Invalid coordinates.");
+                xCoord = Math.floor(Math.random() * 10); //0-9
+                xLetter = String.fromCharCode((xCoord + 65));
+                yCoord = Math.floor(Math.random() * 10); //0-9
+                isValid = this.isValidCoords(xCoord, yCoord);
+                // ++numAttempts;
+                // if (numAttempts > 200) {
+                //     alert("FATAL ERROR");
+                //     break;
+                // }
+            }
+            console.log("Passed input check.");
+            //numAttempts = 0;
 
-            if (this.chosenMap === "mainCoords1") {
-                let id = "1" + xLetter + yCoord.toString();
+            if (this.chosenMap === "mainCoords1") { //Changing HTML based on random position.
+                id = "1" + xLetter + (yCoord).toString();
                 coordHTMLButton = document.getElementById(id);
                 console.log(id);
                 coordHTMLButton.style.backgroundColor = "red";
             } else if (this.chosenMap === "mainCoords2") {
-                let id = "2" + xCoord.toString() + yCoord.toString();
+                id = "2" + xLetter + (yCoord).toString();
                 coordHTMLButton = document.getElementById(id);
                 console.log(id);
                 coordHTMLButton.style.backgroundColor = "red";
             }
 
-            let direction = Math.floor(Math.random() * 4);
-
-            let isValidDirection = false;
-            while (!isValidDirection) {
-                direction = Math.floor(Math.random() * 4);
-                isValidDirection = this.isValidDirection(direction);
+            let direction = Math.floor(Math.random() * 4); // 0 - 3
+            //Choosing a random direction for the ships to be placed.
+            let isValidDirection = this.isValidDirection(direction, i, xCoord, yCoord);
+            while (!isValidDirection) { //Input validation on random direction.
+                direction = Math.floor(Math.random() * 4); // 0 - 3
+                //TODO: Remove the previously attempted direction from the options available for a random direction.
+                //TODO: If all four directions are checked and invalid, then a special case must be invoked.
+                    //This special case must choose a new x and y coordinate, reset all available direction options, and find a new valid direction.
+                console.log("Trying again... New Direction: " + direction);
+                isValidDirection = this.isValidDirection(direction, i, xCoord, yCoord);
+                // ++numAttempts;
+                // if (numAttempts > 200) {
+                //     alert("FATAL ERROR");
+                //     break;
+                // }
             }
-            console.log(direction);
 
-            switch (direction) {
-                case 0:
-                    //TODO: Must place the full ship. Once done, all 5 ships will be placed this way.
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
+            if (direction === 0) { //Placing up
+                console.log("Placing Up!");
+                for (let j = 0; j < this.#ships[i].getLength(); j++) { //For each piece of the ship
+                    this.#gameBoard[xCoord][yCoord + j] = 1;
+                    this.#ships[i].setPieceLocation(j, xCoord, yCoord + j);
+
+                    let newId;
+                    if (this.chosenMap === "mainCoords1") {
+                        xLetter = String.fromCharCode((xCoord + 65));
+                        newId = "1" + xLetter + (yCoord + j).toString();
+                    }
+                    else if (this.chosenMap === "mainCoords2") {
+                        xLetter = String.fromCharCode((xCoord + 65));
+                        newId = "2" + xLetter + (yCoord + j).toString();
+                    }
+                    console.log("new ID: " + newId);
+                    coordHTMLButton = document.getElementById(newId);
+                    coordHTMLButton.style.backgroundColor = "red";
+                    //We need to update the ID for the buttons as we go, in order to change them to red.
+                }
             }
+            else if (direction === 1) { //Right
+                console.log("Placing Right!");
+                for (let j = 0; j < this.#ships[i].getLength(); j++) { //For each piece of the ship
+                    this.#gameBoard[xCoord + j][yCoord] = 1;
+                    this.#ships[i].setPieceLocation(j, xCoord + j, yCoord);
+
+                    let newId;
+                    if (this.chosenMap === "mainCoords1") {
+                        xLetter = String.fromCharCode(((xCoord + j) + 65));
+                        newId = "1" + xLetter + yCoord.toString();
+                    }
+                    else if (this.chosenMap === "mainCoords2") {
+                        xLetter = String.fromCharCode(((xCoord + j) + 65));
+                        newId = "2" + xLetter + yCoord.toString();
+                    }
+                    console.log("new ID: " + newId);
+                    coordHTMLButton = document.getElementById(newId);
+                    coordHTMLButton.style.backgroundColor = "red";
+                    //We need to update the ID for the buttons as we go, in order to change them to red.
+                }
+            }
+            else if (direction === 2) { //Down
+                console.log("Placing Down!");
+                for (let j = 0; j < this.#ships[i].getLength(); j++) { //For each piece of the ship
+                    this.#gameBoard[xCoord][yCoord - j] = 1;
+                    this.#ships[i].setPieceLocation(j, xCoord, yCoord - j);
+
+                    let newId;
+                    if (this.chosenMap === "mainCoords1") {
+                        xLetter = String.fromCharCode((xCoord + 65));
+                        newId = "1" + xLetter + (yCoord - j).toString();
+                    }
+                    else if (this.chosenMap === "mainCoords2") {
+                        xLetter = String.fromCharCode((xCoord + 65));
+                        newId = "2" + xLetter + (yCoord - j).toString();
+                    }
+                    console.log("new ID: " + newId);
+                    coordHTMLButton = document.getElementById(newId);
+                    coordHTMLButton.style.backgroundColor = "red";
+                    //We need to update the ID for the buttons as we go, in order to change them to red.
+                }
+            }
+            else if (direction === 3) { //Left
+                console.log("Placing Left!");
+                for (let j = 0; j < this.#ships[i].getLength(); j++) { //For each piece of the ship
+                    this.#gameBoard[xCoord - j][yCoord] = 1;
+                    this.#ships[i].setPieceLocation(j, xCoord - j, yCoord);
+
+                    let newId;
+                    if (this.chosenMap === "mainCoords1") {
+                        xLetter = String.fromCharCode(((xCoord - j) + 65));
+                        newId = "1" + xLetter + yCoord.toString();
+                    }
+                    else if (this.chosenMap === "mainCoords2") {
+                        xLetter = String.fromCharCode(((xCoord - j) + 65));
+                        newId = "2" + xLetter + yCoord.toString();
+                    }
+                    console.log("new ID: " + newId);
+                    coordHTMLButton = document.getElementById(newId);
+                    coordHTMLButton.style.backgroundColor = "red";
+                    //We need to update the ID for the buttons as we go, in order to change them to red.
+                }
+            }
+
+            console.log(this.toString());
         }
     }
 
-    isValidDirection(direction) {
-        let canPlace = true; //TODO: Must finish this method.
-        for (let i = 1; i < length; i++) { //needs to check full length of ship. So needs shipnum.
-            const newX = xCoord + dx * i; //This code is based on us not knowing the direction. Since this is randomized, we do know it.
-            const newY = yCoord + dy * i;
-            if (this.#gameBoard[newX]?.[newY] === 1) { //Checks each piece over the ship length to see if there is another place.
-                canPlace = false; //Invalid direction.
-                break;
+    isValidCoords(xCoord, yCoord) {
+        let valid = false;
+        //console.log(xCoord);
+        //console.log(yCoord);
+        if ((xCoord > -1 && xCoord < 10) && (yCoord > -1 && yCoord < 10) && this.#gameBoard[xCoord][yCoord] !== 1) { //-1 < x < 10, -1 < y < 10
+            //Valid coordinates.
+            valid = true;
+        }
+        else {
+            //Invalid coordinates.
+            console.log("INVALID");
+        }
+        return valid;
+    }
+
+    isValidDirection(direction, shipNum, xCoord, yCoord) {
+        let canPlace = true;
+        if (direction === 0) { //Up
+            let i = 0;
+            console.log("Ship length: " + this.#ships[shipNum].getLength());
+            while ( i < this.#ships[shipNum].getLength()) {
+                console.log("Checking y coord: " + (yCoord + i));
+                if (!this.isValidCoords(xCoord, (yCoord + i))) {
+                    console.log("Bad coords found in isValidDirection");
+                    canPlace = false;
+                } else if (this.#gameBoard[xCoord][yCoord + i] === 1) {
+                    console.log("Double placement attempt found in isValidDirection");
+                    canPlace = false;
+                }
+                ++i;
             }
         }
+        else if (direction === 1) { //Right
+            let j = 0;
+            console.log("Ship length: " + this.#ships[shipNum].getLength());
+            while ( j < this.#ships[shipNum].getLength()) {
+                console.log("Checking x coord: " + (xCoord + j));
+                if (!this.isValidCoords(xCoord + j, yCoord)) {
+                    console.log("Bad coords found in isValidDirection");
+                    canPlace = false;
+                } else if (this.#gameBoard[xCoord + j][yCoord] === 1) {
+                    console.log("Double placement attempt found in isValidDirection");
+                    canPlace = false;
+                }
+                ++j;
+            }
 
+        }
+        else if (direction === 2) { //Down
+            let k = 0;
+            console.log("Ship length: " + this.#ships[shipNum].getLength());
+            while ( k < this.#ships[shipNum].getLength()) {
+                console.log("Checking y coord: " + (yCoord - k));
+                if (!this.isValidCoords(xCoord, (yCoord - k))) {
+                    console.log("Bad coords found in isValidDirection");
+                    canPlace = false;
+                } else if (this.#gameBoard[xCoord][yCoord - k] === 1) {
+                    console.log("Double placement attempt found in isValidDirection");
+                    canPlace = false;
+                }
+                ++k;
+            }
+        }
+        else if (direction === 3) { //Left
+            let l = 0;
+            console.log("Ship length: " + this.#ships[shipNum].getLength());
+            while ( l < this.#ships[shipNum].getLength()) {
+                console.log("Checking x coord: " + (xCoord - l));
+                if (!this.isValidCoords(xCoord - l, yCoord)) {
+                    console.log("Bad coords found in isValidDirection");
+                    canPlace = false;
+                } else if (this.#gameBoard[xCoord - l][yCoord] === 1) {
+                    console.log("Double placement attempt found in isValidDirection");
+                    canPlace = false;
+                }
+                ++l;
+            }
+        }
+        else {
+            alert("Error");
+        }
+
+        console.log(canPlace);
         return canPlace;
+    }
+
+    toString() {
+        let toReturn = '   0 1 2 3 4 5 6 7 8 9\n';
+        for (let i = 0; i < 10; i++) {
+            toReturn += (i) + '  ' + this.#gameBoard[i].join(' ') + '\n';
+        }
+        return toReturn;
     }
 }
 
@@ -126,48 +307,51 @@ class Piece {
     #isHit;
     #xCoord;
     #yCoord;
+    #pieceNum;
+
 
     constructor() {
         this.#isHit = false;
         this.#xCoord = 0;
         this.#yCoord = 0;
+        this.#pieceNum = 0;
     }
 
     setXCoord(x) {
-        this.xCoord = x;
+        this.#xCoord = x;
     }
 
     setYCoord(y) {
-        this.yCoord = y;
+        this.#yCoord = y;
     }
 
     getYCoord() {
-        return this.yCoord;
+        return this.#yCoord;
     }
 
     getXCoord() {
-        return this.xCoord;
+        return this.#xCoord;
     }
 
     setPieceNum(pieceNum) {
-        this.pieceNum = pieceNum;
+        this.#pieceNum = pieceNum;
     }
 
     getPieceNum() {
-        return this.pieceNum;
+        return this.#pieceNum;
     }
 
     setHit(hit) {
-        this.isHit = hit;
+        this.#isHit = hit;
     }
 
     isHit() {
-        return this.isHit;
+        return this.#isHit;
     }
 }
 
 class Ship {
-    #length = 0;
+    #length;
     #shipPieces;
 
     constructor(length) {
@@ -179,7 +363,7 @@ class Ship {
     addPieces() {
         for (let i = 0; i < this.#length; i++) {
             let piece = new Piece();
-            piece.setPieceNum(i + 1);
+            piece.setPieceNum(i);
             this.#shipPieces.push(piece);
         }
     }
