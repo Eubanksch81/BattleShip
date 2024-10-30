@@ -1,57 +1,57 @@
 body {
-    background-color: silver;
+    background-color: navy;
+    display: grid;
+    grid-template-rows: 5% 80% 5%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 main {
     display: grid;
+    /*border: 1px solid black;*/
     grid-template-columns: 45% 45%;
     column-gap: 20px;
     justify-content: center;
     margin-top: 50px;
-
+    height: 600px;
 }
 
 .gameContainer {
-    display: grid;
-    grid-template-rows: 5% 95%;
-    grid-template-columns: 10% 90%;
+    /*display: grid;*/
+    /*grid-template-rows: 5% 95%;*/
+    /*grid-template-columns: 10% 90%;*/
     /*border: 1px solid black;*/
     max-width: 100%;
     /*padding: 20px;*/
-}
-
-.topCoords {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    column-gap: 5px;
-    padding: 0 20px 0 20px;
-    text-align: center;
-}
-
-.sideCoords {
-    display: grid;
-    grid-template-rows: repeat(10, 1fr);
-    padding: 20px;
-    row-gap: 5px;
-    /*border: 1px solid black;*/
 }
 
 div.mainCoords {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
-    border: 1px solid black;
+    /*border: 1px solid black;*/
     padding: 20px;
     gap: 5px;
 }
 
 .boxElement {
     text-align: center;
-    background-color: gold;
+    background-color: darkslateblue;
+    color: silver;
     border: 1px solid black;
+    border-radius: 10px;
+    max-width: 100px;
+    height: 50px;
 }
-.exBoxElement{
-    padding: 15px;
+
+ul {
+    text-align: center;
+    padding-right: 2px;
+}
+
+h1 {
+    color: white;
     text-align: center;
 }
 
@@ -60,5 +60,10 @@ div.mainCoords {
         display: grid;
         grid-template-columns: 100%;
         grid-template-rows: 50%;
+        row-gap: 400px;
+    }
+
+    div.mainCoords {
+        max-height: 20px;
     }
 }

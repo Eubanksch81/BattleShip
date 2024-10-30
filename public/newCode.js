@@ -1,4 +1,38 @@
 window.onload = function() {
+    const callHTMLTurn = document.getElementById("showTurn");
+
+    populateArrays();
+
+    const buttons = document.querySelectorAll(".boxElement");
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            getCoords(event);
+            callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
+            });
+        button.addEventListener("mouseover", () => {
+            button.style.border = "5px solid red";
+        });
+        button.addEventListener("mouseout", () => {
+            button.style.border = "1px solid black"; // Reset the border when the mouse moves out
+        });
+    });
+
+    let map1 = new BattleMap(1);
+    map1.placeRandomShips();
+    let map2 = new BattleMap(2);
+    map2.placeRandomShips();
+
+    callBotTurn(map2);
+    callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
+};
+
+function callBotTurn(map) {
+    const callHTMLTurn = document.getElementById("showTurn");
+    callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
+    map.botTurn();
+}
+
+function populateArrays() {
     let htmlCoords = document.getElementById("mainCoords1");
     let oStrCoords = ``;
 
@@ -8,26 +42,14 @@ window.onload = function() {
                 let iValue = i + 65;
                 let idName = m.toString() + String.fromCharCode(iValue) + j.toString();
                 // console.log(idName);
-                oStrCoords += `<button type="button" class="boxElement" id="${idName}"> ${String.fromCharCode(iValue)} </button>`;
+                oStrCoords += `<button type="button" class="boxElement" id="${idName}"> * </button>`;
             }
         }
         htmlCoords.innerHTML = oStrCoords;
         htmlCoords = document.getElementById("mainCoords2");
         oStrCoords = ``;
     }
-
-    const buttons = document.querySelectorAll(".boxElement");
-    buttons.forEach(button => {
-        button.addEventListener("click", getCoords);
-    });
-
-    let map2 = new BattleMap(2);
-    map2.placeRandomShips();
-
-    let map1 = new BattleMap(1);
-    map1.placeRandomShips();
-
-};
+}
 
 function getCoords(event) {
     // alert("Button " + event.target.id + " clicked!");
@@ -64,6 +86,23 @@ class BattleMap {
         }
     }
 
+    botTurn() { //Plays the bot's turn against the player on board 1.
+        let botXCoord = Math.floor(Math.random() * 10); //0-9
+        let xLetter = String.fromCharCode((botXCoord + 65)); //A - J
+        let botYCoord = Math.floor(Math.random() * 10); //0-9
+
+        let id = "1" + xLetter + botYCoord.toString();
+        console.log("hitting ID: " + id);
+
+        const button = document.getElementById(id);
+        if (this.#gameBoard[botXCoord][botYCoord] === 1) {
+            button.style.background = "orange";
+        }
+        else {
+            button.style.background = "pink";
+        }
+    }
+
     placeRandomShips() {
         for (let i = 0; i < 5; ++i) {
             let xCoord = Math.floor(Math.random() * 10); //0-9
@@ -89,18 +128,6 @@ class BattleMap {
             }
             console.log("Passed input check.");
             //numAttempts = 0;
-
-            // if (this.chosenMap === "mainCoords1") { //Changing HTML based on random position.
-            //     id = "1" + xLetter + (yCoord).toString();
-            //     coordHTMLButton = document.getElementById(id);
-            //     console.log(id);
-            //     coordHTMLButton.style.backgroundColor = "red";
-            // } else if (this.chosenMap === "mainCoords2") {
-            //     id = "2" + xLetter + (yCoord).toString();
-            //     coordHTMLButton = document.getElementById(id);
-            //     console.log(id);
-            //     coordHTMLButton.style.backgroundColor = "red";
-            // } //Commenting this out because it's causing an error in the special case where no directions are valid.
 
             let directions = [0, 1, 2, 3];
             let direction = directions[Math.floor(Math.random() * 4)]; // 0 - 3
@@ -156,7 +183,7 @@ class BattleMap {
                     }
                     console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "red";
+                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
@@ -177,7 +204,7 @@ class BattleMap {
                     }
                     console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "red";
+                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
@@ -198,7 +225,7 @@ class BattleMap {
                     }
                     console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "red";
+                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
@@ -219,7 +246,7 @@ class BattleMap {
                     }
                     console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "red";
+                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
