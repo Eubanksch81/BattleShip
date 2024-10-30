@@ -90,26 +90,46 @@ class BattleMap {
             console.log("Passed input check.");
             //numAttempts = 0;
 
-            if (this.chosenMap === "mainCoords1") { //Changing HTML based on random position.
-                id = "1" + xLetter + (yCoord).toString();
-                coordHTMLButton = document.getElementById(id);
-                console.log(id);
-                coordHTMLButton.style.backgroundColor = "red";
-            } else if (this.chosenMap === "mainCoords2") {
-                id = "2" + xLetter + (yCoord).toString();
-                coordHTMLButton = document.getElementById(id);
-                console.log(id);
-                coordHTMLButton.style.backgroundColor = "red";
-            }
+            // if (this.chosenMap === "mainCoords1") { //Changing HTML based on random position.
+            //     id = "1" + xLetter + (yCoord).toString();
+            //     coordHTMLButton = document.getElementById(id);
+            //     console.log(id);
+            //     coordHTMLButton.style.backgroundColor = "red";
+            // } else if (this.chosenMap === "mainCoords2") {
+            //     id = "2" + xLetter + (yCoord).toString();
+            //     coordHTMLButton = document.getElementById(id);
+            //     console.log(id);
+            //     coordHTMLButton.style.backgroundColor = "red";
+            // } //Commenting this out because it's causing an error in the special case where no directions are valid.
 
-            let direction = Math.floor(Math.random() * 4); // 0 - 3
+            let directions = [0, 1, 2, 3];
+            let direction = directions[Math.floor(Math.random() * 4)]; // 0 - 3
+            console.log("Directions: " + directions);
             //Choosing a random direction for the ships to be placed.
             let isValidDirection = this.isValidDirection(direction, i, xCoord, yCoord);
+
             while (!isValidDirection) { //Input validation on random direction.
-                direction = Math.floor(Math.random() * 4); // 0 - 3
-                //TODO: Remove the previously attempted direction from the options available for a random direction.
-                //TODO: If all four directions are checked and invalid, then a special case must be invoked.
-                    //This special case must choose a new x and y coordinate, reset all available direction options, and find a new valid direction.
+                directions.splice(directions.indexOf(direction), 1, -1); //Replaces invalid direction with -1
+                direction = directions[Math.floor(Math.random() * 4)]; // 0 - 3
+                console.log("New Directions: " + directions);
+                while (direction === -1) {
+                    let allMinusOne = directions.every(value => value === -1); //Checks if every value of directions is -1.
+                    direction = directions[Math.floor(Math.random() * 4)]; // 0 - 3
+                    if (allMinusOne) { //Every direction is invalid. Special case.
+                        console.log("Fatal coordinate. Switching.");
+                        xCoord = Math.floor(Math.random() * 10); //0-9
+                        xLetter = String.fromCharCode((xCoord + 65)); //A - J
+                        yCoord = Math.floor(Math.random() * 10); //0-9 NOTE: Must add 1 when putting to ID.
+                        directions = [0, 1, 2, 3];
+                        direction = directions[Math.floor(Math.random() * 4)];
+                    }
+                    // ++numAttempts;
+                    // if (numAttempts > 200) {
+                    //     alert("FATAL ERROR");
+                    //     break;
+                    // }
+                }
+
                 console.log("Trying again... New Direction: " + direction);
                 isValidDirection = this.isValidDirection(direction, i, xCoord, yCoord);
                 // ++numAttempts;
