@@ -3,10 +3,23 @@ window.onload = function() {
 
     populateArrays();
 
+    let map1 = new BattleMap(1); //TODO: Check localStorage. If localStorage has data, pull from localStorage instead.
+                                                    //Else, just placeRandomShips like normal.
+    map1.placeRandomShips();
+    let map2 = new BattleMap(2);
+    map2.placeRandomShips();
+
     const buttons = document.querySelectorAll(".boxElement");
     buttons.forEach(button => {
-        button.addEventListener("click", () => {
-            getCoords(event);
+        button.addEventListener("click", () => { //When any button is clicked.
+            button.classList.add('flash'); //Adds a neat flashing effect when the button is clicked.
+            setTimeout(() => {
+                button.classList.remove('flash');
+            }, 300); // Adjust duration as needed
+
+            callPlayerTurn(button.id, map1); //TODO: Needs to only be for map2 clicks.
+            callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
+            callBotTurn(map2); //Bot goes immediately afterwards; simulates a full round (two turns).
             callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
             });
         button.addEventListener("mouseover", () => {
@@ -17,14 +30,15 @@ window.onload = function() {
         });
     });
 
-    let map1 = new BattleMap(1);
-    map1.placeRandomShips();
-    let map2 = new BattleMap(2);
-    map2.placeRandomShips();
-
-    callBotTurn(map2);
+    callBotTurn(map2); //Bot always goes first; immediately starts with a bot turn.
     callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
 };
+
+function callPlayerTurn(id, map) {
+    const callHTMLTurn = document.getElementById("showTurn");
+    callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
+    map.playerTurn(id);
+}
 
 function callBotTurn(map) {
     const callHTMLTurn = document.getElementById("showTurn");
@@ -51,17 +65,6 @@ function populateArrays() {
     }
 }
 
-function getCoords(event) {
-    // alert("Button " + event.target.id + " clicked!");
-    let xCoord = event.target.id.substring(1, 2);
-    let yCoord = event.target.id.substring(2);
-    xCoord = xCoord.charCodeAt(0);
-    xCoord = xCoord - 64;
-    console.log(xCoord + " " + yCoord);
-    //We now know which button has been pressed, and have it's coordinates saved as code.
-
-}
-
 class BattleMap {
     #gameBoard;
     #ships;
@@ -84,6 +87,13 @@ class BattleMap {
             alert("Error! Wrong map number.");
             this.chosenMap = "Error";
         }
+    }
+
+    playerTurn() {
+        //TODO: Manipulate a button with a given id to simulate a hit.
+        //TODO: Check if hit or not a hit, change HTML otherwise.
+        //TODO: Store new data into localStorage.
+        //TODO: Check win condition.
     }
 
     botTurn() { //Plays the bot's turn against the player on board 1.

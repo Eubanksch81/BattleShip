@@ -43,6 +43,13 @@ div.mainCoords {
     border-radius: 10px;
     max-width: 100px;
     height: 50px;
+    transition: background-color 0.2s ease;
+}
+
+.flash {
+    background-color: red !important;
+    /*Used to override manual button background settings and temporarily flash red*/
+    transition: background-color 0.3s ease;
 }
 
 ul {
