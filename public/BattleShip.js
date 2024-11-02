@@ -37,7 +37,7 @@ window.onload = function() {
     }
     // startButton.style.display = "none"; //Clears the start button, prevents it from being clicked.
 
-    callBotTurn(map2); //Bot always goes first; immediately starts with a bot turn.
+    callBotTurn(map1); //Bot always goes first; immediately starts with a bot turn.
     callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
     // })
 
