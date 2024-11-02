@@ -14,37 +14,32 @@ window.onload = function() {
     console.log(savedGameState[0]);
     console.log(savedGameState[1]);
 
-    document.getElementById("showTurn").innerHTML = `<button type="button" id="start"> Start! </button>`; //Sets start button
-    const startButton = document.querySelector("#start");
-    startButton.addEventListener("click", () => { //When the start button is clicked
-        if(savedGameState.every(x => x === null)) { //Checks the save state
-            console.log("Starting empty!!");
+    // document.getElementById("showTurn").innerHTML = `<button type="button" id="start"> Start! </button>`; //Sets start button
+    // const startButton = document.querySelector("#start");
+    // startButton.addEventListener("click", () => { //When the start button is clicked
+    if (savedGameState.every(x => x === null)) { //Checks the save state
+        map1 = new BattleMap(1);
+        map1.placeRandomShips();
+        map2 = new BattleMap(2);
+        map2.placeRandomShips();
 
-            map1 = new BattleMap(1);
-            map1.placeRandomShips();
-            map2 = new BattleMap(2);
-            map2.placeRandomShips();
+        localStorage.setItem("map1", map1.toJSON());
+        localStorage.setItem("map2", map2.toJSON());
 
-            localStorage.setItem("map1", map1.toJSON());
-            localStorage.setItem("map2", map2.toJSON());
+        console.log("Trying to pull map 2!");
+        console.log(localStorage.getItem("map2"));
+    } else {
+        map1 = new BattleMap(1);
+        map2 = new BattleMap(2);
 
-            console.log("Trying to pull map 2!");
-            console.log(localStorage.getItem("map2"));
-        }
-        else {
-            console.log("Old game?");
+        map1.populateMapFromLocalStorage(savedGameState[0], 1);
+        map2.populateMapFromLocalStorage(savedGameState[1], 2);
+    }
+    // startButton.style.display = "none"; //Clears the start button, prevents it from being clicked.
 
-            map1 = new BattleMap(1);
-            map2 = new BattleMap(2);
-
-            map1.populateMapFromLocalStorage(savedGameState[0], 1);
-            map2.populateMapFromLocalStorage(savedGameState[1], 2);
-        }
-        startButton.style.display = "none"; //Clears the start button, prevents it from being clicked.
-
-        callBotTurn(map2); //Bot always goes first; immediately starts with a bot turn.
-        callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
-    })
+    callBotTurn(map2); //Bot always goes first; immediately starts with a bot turn.
+    callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
+    // })
 
 
     const buttons = document.querySelectorAll(".boxElement");
@@ -135,20 +130,18 @@ class BattleMap {
     }
 
     populateMapFromLocalStorage(mapData, mapNum) { //Takes the given array from JSON.parse and populates the BattleMap class.
-        console.log("Trying recommended deep parse:");
         mapData = deepParse(mapData);
 
         // Ensure we don't exceed the number of ships available
         for (let i = 0; i < Math.min(this.#ships.length, mapData.length); i++) {
             const ship = this.#ships[i];
             const shipData = mapData[i][0];
-            console.log("Current Ship length:", ship.getLength());
+            //console.log("Current Ship length:", ship.getLength());
 
             for (let j = 0; j < ship.getLength(); j++) { //Fills out the gameboard and ship pieces based on the pieceData.
                 const pieceData = shipData[j];
                 if (pieceData) { //If pieceData is valid
-                    console.log(pieceData[0], pieceData[1], pieceData[2], pieceData[3]);
-
+                    //console.log(pieceData[0], pieceData[1], pieceData[2], pieceData[3]);
                     ship.populatePieceFromStorage(pieceData);
                     let xCoord = ship.getPieceXCoord(j);
                     let yCoord = ship.getPieceYCoord(j);
@@ -161,14 +154,14 @@ class BattleMap {
                     }
 
                     let id = `${mapNum}${String.fromCharCode(xCoord + 65)}${yCoord}`
-                    console.log("Id in populate: " + id);
+                    //console.log("Id in populate: " + id);
                     const newButton  = document.getElementById(id);
                     newButton.style.backgroundColor = "maroon";
                 }
             }
         }
 
-        console.log("Gameboard post-fill:", this.#gameBoard);
+        //console.log("Gameboard post-fill:", this.#gameBoard);
     }
 
     toJSON() {
