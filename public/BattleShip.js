@@ -14,6 +14,9 @@ window.onload = function() {
     console.log(savedGameState[0]);
     console.log(savedGameState[1]);
 
+    // document.getElementById("showTurn").innerHTML = `<button type="button" id="start"> Start! </button>`; //Sets start button
+    // const startButton = document.querySelector("#start");
+    // startButton.addEventListener("click", () => { //When the start button is clicked
     if (savedGameState.every(x => x === null)) { //Checks the save state
         map1 = new BattleMap(1);
         map1.placeRandomShips();
@@ -35,7 +38,6 @@ window.onload = function() {
     // startButton.style.display = "none"; //Clears the start button, prevents it from being clicked.
 
     callBotTurn(map1); //Bot always goes first; immediately starts with a bot turn.
-    //NOTE: bot turn uses map1, and player turn uses map2.
     callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
     // })
 
