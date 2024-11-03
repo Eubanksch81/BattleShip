@@ -79,7 +79,7 @@ h1 {
         display: grid;
         grid-template-columns: 100%;
         grid-template-rows: 50%;
-        row-gap: 400px;
+        row-gap: 500px;
     }
 
     div.mainCoords {

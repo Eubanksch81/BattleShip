@@ -10,6 +10,9 @@ window.onload = function() {
         JSON.parse(localStorage.getItem("map2"))
     ]; //Gets map1 and map2 from localStorage.
 
+    console.log(savedGameState[0]);
+    console.log(savedGameState[1]);
+
     if (savedGameState.every(x => x === null)) { //Checks the save state. This is if the localStorage is clear.
         map1 = new BattleMap(1);
         map1.placeRandomShips();
@@ -21,39 +24,48 @@ window.onload = function() {
 
         console.log("Trying to pull map 2!");
         console.log(localStorage.getItem("map2"));
-    } else { //localStorage has something. Pull from localStorage.
+
+        let badCoords = []; //Sets up the badCoords array for both maps.
+        // This is done here because the badCoords will always be empty when the maps are empty.
+        localStorage.setItem("badCoords1", JSON.stringify(badCoords));
+        localStorage.setItem("badCoords2", JSON.stringify(badCoords));
+
+    }
+    else { //localStorage has something. Pull from localStorage.
         map1 = new BattleMap(1);
         map2 = new BattleMap(2);
 
         map1.populateMapFromLocalStorage(savedGameState[0], 1);
         map2.populateMapFromLocalStorage(savedGameState[1], 2);
     }
-    // startButton.style.display = "none"; //Clears the start button, prevents it from being clicked.
 
-    callBotTurn(map1); //Bot always goes first; immediately starts with a bot turn.
-    //Bot turn uses map1, and player turn uses map2.
     callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
-    // })
 
 
     const buttons = document.querySelectorAll(".boxElement");
-    buttons.forEach(button => {
-        button.addEventListener("click", () => { //When any button is clicked.
+    buttons.forEach(button => { //If any map button is clicked
+        button.addEventListener("click", () => {
             button.classList.add('flash'); //Adds a neat flashing effect when the button is clicked.
             setTimeout(() => {
                 button.classList.remove('flash');
             }, 300); // Adjust duration as needed
 
             console.log(button.id);
-            if (button.id.charAt(0) === '2') { //Player can only perform map2 clicks.
-                callPlayerTurn(button.id, map1);
+            if (button.id.charAt(0) === '2' && callPlayerTurn(button.id, map2)) { //Player can only perform map2 clicks.
+                //Bot turn uses map1, and player turn uses map2.
+                console.log("Valid turn");
+                //Calls the player turn as the condition. Condition returns false if it's a piece that's already been hit.
+                //TODO: Check win condition.
                 callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
                 callBotTurn(map1); //Bot goes immediately afterwards; simulates a full round (two turns).
+                //TODO: Finish Bot turn logic.
+                //TODO: Check win condition.
                 callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
                 localStorage.setItem("map1", map1.toJSON()); //Updates the localStorage of both maps.
                 localStorage.setItem("map2", map2.toJSON());
             }
         });
+
         button.addEventListener("mouseover", () => {
             button.style.border = "5px solid red";
         });
@@ -70,14 +82,10 @@ window.onload = function() {
 };
 
 function callPlayerTurn(id, map) {
-    const callHTMLTurn = document.getElementById("showTurn");
-    callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
-    map.playerTurn(id);
+    return map.playerTurn(id);
 }
 
 function callBotTurn(map) {
-    const callHTMLTurn = document.getElementById("showTurn");
-    callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
     map.botTurn();
 }
 
@@ -141,19 +149,37 @@ class BattleMap {
                     let yCoord = ship.getPieceYCoord(j);
                     let isHit = ship.isPieceHit(j);
 
-                    if (isHit) {
-                        this.#gameBoard[xCoord][yCoord] = 2;
-                    } else {
-                        this.#gameBoard[xCoord][yCoord] = 1;
-                    }
-
                     let id = `${mapNum}${String.fromCharCode(xCoord + 65)}${yCoord}`
                     //console.log("Id in populate: " + id);
                     const newButton  = document.getElementById(id);
-                    newButton.style.backgroundColor = "maroon";
+
+                    if (isHit) {
+                        this.#gameBoard[xCoord][yCoord] = 2;
+                        newButton.style.backgroundColor = "orange";
+                    }
+                    else {
+                        this.#gameBoard[xCoord][yCoord] = 1;
+                        newButton.style.backgroundColor = "maroon";
+                    }
                 }
             }
         }
+
+        let missStorageId = "badCoords" + mapNum.toString();
+        let missData = localStorage.getItem(missStorageId);
+        missData = deepParse(missData);
+        // console.log(missData);
+
+        for (let i = 0; i < missData.length; i++) { //Gets ID from x,y data and changes button color.
+            let xCoord = missData[i][0];
+            let yCoord = missData[i][1];
+
+            let missId = mapNum + String.fromCharCode(xCoord + 65) + yCoord;
+            document.getElementById(missId).style.backgroundColor = "pink";
+            this.#gameBoard[xCoord][yCoord] = 3;
+        }
+
+
 
         // console.log(`this ${this.#chosenMap} map: `);
         // console.log(`${this.#gameBoard}`);
@@ -173,10 +199,44 @@ class BattleMap {
         return JSON.stringify(battleMapJSON);
     }
 
-    playerTurn() {
-        //TODO: Manipulate a button with a given id to simulate a hit.
-        //TODO: Check if hit or not a hit, change HTML otherwise.
-        //TODO: Store new data into localStorage.
+    playerTurn(id) {
+        let xCoord = id.charAt(1); //A-J
+        xCoord = (xCoord.charCodeAt(0) - 65); //0-9
+        let yCoord = parseInt(id.charAt(2)); //0-9
+
+        if (this.#gameBoard[xCoord][yCoord] === 1) { //Hit
+            console.log("Hit!");
+            this.#gameBoard[xCoord][yCoord] = 2; //Hits piece.
+            document.getElementById(id).style.backgroundColor = "orange";
+
+            for (let i = 0; i < this.#ships.length; ++i) {
+                for (let j = 0; j < this.#ships[i].getLength(); ++j) {
+                    if ((this.#ships[i].getPieceXCoord(j) === xCoord) && (this.#ships[i].getPieceYCoord(j) === yCoord)) {
+                        this.#ships[i].hitPiece(j);
+                        console.log(`Hit piece ${j} in ship ${i}`);
+                    }
+                }
+            }
+            return true;
+        }
+        else if (this.#gameBoard[xCoord][yCoord] === 0) { //Miss
+            this.#gameBoard[xCoord][yCoord] = 3; //Marks piece as a miss.
+            document.getElementById(id).style.backgroundColor = "pink";
+
+            let badCoord = [xCoord, yCoord]; //Takes missed coordinates
+            let badCoords = localStorage.getItem("badCoords2");
+            badCoords = JSON.parse(badCoords); //Pulls and parses badCoords array
+            badCoords.push(badCoord); //Adds missed coordinates
+            localStorage.setItem("badCoords2", JSON.stringify(badCoords)); //Places back into localStorage.
+
+            //Player turn always uses badCoords2, and bot turn always uses badCoords1.
+            //This is because the numbers correlate to the map that the player/bot is attacking.
+            return true;
+        }
+        else { //Ship has already been hit
+            alert("Ship already hit!");
+            return false;
+        }
         //TODO: Check win condition.
     }
 
@@ -189,15 +249,29 @@ class BattleMap {
         console.log("hitting ID: " + id);
 
         const button = document.getElementById(id);
-        console.log(`This ${this.#chosenMap} map: `);
-        console.log(`${this.#gameBoard}`);
-        if (this.#gameBoard[botXCoord][botYCoord] === 1) {
-            console.log("Map: ");
-            console.log(this.#gameBoard);
+        // console.log(`This ${this.#chosenMap} map: `);
+        // console.log(`${this.#gameBoard}`);
+        if (this.#gameBoard[botXCoord][botYCoord] === 1) { //Hit
             button.style.background = "orange";
+
+            for (let i = 0; i < this.#ships.length; ++i) { //Stores hit on map
+                for (let j = 0; j < this.#ships[i].getLength(); ++j) {
+                    if ((this.#ships[i].getPieceXCoord(j) === botXCoord) && (this.#ships[i].getPieceYCoord(j) === botYCoord)) {
+                        this.#ships[i].hitPiece(j);
+                        console.log(`Bot Hit piece ${j} in ship ${i}`);
+                    }
+                }
+            }
         }
         else {
             button.style.background = "pink";
+            this.#gameBoard[botXCoord][botYCoord] = 3; //Marks piece as a miss.
+
+            let badCoord = [botXCoord, botYCoord]; //Takes missed coordinates
+            let badCoords = localStorage.getItem("badCoords1");
+            badCoords = JSON.parse(badCoords); //Pulls and parses badCoords array
+            badCoords.push(badCoord); //Adds missed coordinates
+            localStorage.setItem("badCoords1", JSON.stringify(badCoords)); //Places back into localStorage.
         }
     }
 
@@ -208,35 +282,23 @@ class BattleMap {
             let yCoord = Math.floor(Math.random() * 10); //0-9 NOTE: Must add 1 when putting to ID.
             let coordHTMLButton;
             let id;
-            //let numAttempts = 0; //DEBUGGING ONLY
 
-            // console.log(xCoord + ", " + yCoord);
             let isValid = this.isValidCoords(xCoord, yCoord);
             while(!isValid) { //Input validation of random coordinates
-                // console.log("Invalid coordinates.");
                 xCoord = Math.floor(Math.random() * 10); //0-9
                 xLetter = String.fromCharCode((xCoord + 65));
                 yCoord = Math.floor(Math.random() * 10); //0-9
                 isValid = this.isValidCoords(xCoord, yCoord);
-                // ++numAttempts;
-                // if (numAttempts > 200) {
-                //     alert("FATAL ERROR");
-                //     break;
-                // }
             }
-            // console.log("Passed input check.");
-            //numAttempts = 0;
 
             let directions = [0, 1, 2, 3];
             let direction = directions[Math.floor(Math.random() * 4)]; // 0 - 3
-            // console.log("Directions: " + directions);
             //Choosing a random direction for the ships to be placed.
             let isValidDirection = this.isValidDirection(direction, i, xCoord, yCoord);
 
             while (!isValidDirection) { //Input validation on random direction.
                 directions.splice(directions.indexOf(direction), 1, -1); //Replaces invalid direction with -1
                 direction = directions[Math.floor(Math.random() * 4)]; // 0 - 3
-                // console.log("New Directions: " + directions);
                 while (direction === -1) {
                     let allMinusOne = directions.every(value => value === -1); //Checks if every value of directions is -1.
                     direction = directions[Math.floor(Math.random() * 4)]; // 0 - 3
@@ -248,20 +310,9 @@ class BattleMap {
                         directions = [0, 1, 2, 3];
                         direction = directions[Math.floor(Math.random() * 4)];
                     }
-                    // ++numAttempts;
-                    // if (numAttempts > 200) {
-                    //     alert("FATAL ERROR");
-                    //     break;
-                    // }
                 }
 
-                // console.log("Trying again... New Direction: " + direction);
                 isValidDirection = this.isValidDirection(direction, i, xCoord, yCoord);
-                // ++numAttempts;
-                // if (numAttempts > 200) {
-                //     alert("FATAL ERROR");
-                //     break;
-                // }
             }
 
             if (direction === 0) { //Placing up
@@ -278,7 +329,6 @@ class BattleMap {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "2" + xLetter + (yCoord + j).toString();
                     }
-                    // console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
                     coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
@@ -298,7 +348,6 @@ class BattleMap {
                         xLetter = String.fromCharCode(((xCoord + j) + 65));
                         newId = "2" + xLetter + yCoord.toString();
                     }
-                     console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
                     coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
@@ -318,7 +367,6 @@ class BattleMap {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "2" + xLetter + (yCoord - j).toString();
                     }
-                    // console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
                     coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
@@ -338,14 +386,11 @@ class BattleMap {
                         xLetter = String.fromCharCode(((xCoord - j) + 65));
                         newId = "2" + xLetter + yCoord.toString();
                     }
-                    // console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
                     coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
-
-            // console.log(this.toString());
         }
     }
 
@@ -411,8 +456,6 @@ class BattleMap {
         else {
             alert("Error: Not a possible direction?");
         }
-
-        // console.log(canPlace);
         return canPlace;
     }
 
