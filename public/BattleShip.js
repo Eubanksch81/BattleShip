@@ -10,22 +10,18 @@ window.onload = function() {
         JSON.parse(localStorage.getItem("map2"))
     ]; //Gets map1 and map2 from localStorage.
 
-    console.log("Checking savedGameState: ");
-    console.log(savedGameState[0]);
-    console.log(savedGameState[1]);
-
-    if (savedGameState.every(x => x === null)) { //Checks the save state
+    if (savedGameState.every(x => x === null)) { //Checks the save state. This is if the localStorage is clear.
         map1 = new BattleMap(1);
         map1.placeRandomShips();
         map2 = new BattleMap(2);
-        map2.placeRandomShips();
+        map2.placeRandomShips(); //Places random ships for each map,
 
-        localStorage.setItem("map1", map1.toJSON());
+        localStorage.setItem("map1", map1.toJSON()); //And stores them in localStorage.
         localStorage.setItem("map2", map2.toJSON());
 
         console.log("Trying to pull map 2!");
         console.log(localStorage.getItem("map2"));
-    } else {
+    } else { //localStorage has something. Pull from localStorage.
         map1 = new BattleMap(1);
         map2 = new BattleMap(2);
 
@@ -52,10 +48,10 @@ window.onload = function() {
             if (button.id.charAt(0) === '2') { //Player can only perform map2 clicks.
                 callPlayerTurn(button.id, map1);
                 callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
-                callBotTurn(map2); //Bot goes immediately afterwards; simulates a full round (two turns).
+                callBotTurn(map1); //Bot goes immediately afterwards; simulates a full round (two turns).
                 callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
-                localStorage.setItem("map1", JSON.stringify(map1)); //Updates the localStorage of both maps.
-                localStorage.setItem("map2", JSON.stringify(map2));
+                localStorage.setItem("map1", map1.toJSON()); //Updates the localStorage of both maps.
+                localStorage.setItem("map2", map2.toJSON());
             }
         });
         button.addEventListener("mouseover", () => {
@@ -118,12 +114,12 @@ class BattleMap {
             new Ship(2)
         ];
         if (mapNum === 1 || mapNum === 2) {
-            this.chosenMap = "mainCoords" + mapNum.toString();
-            // alert(this.chosenMap);
+            this.#chosenMap = "mainCoords" + mapNum.toString();
+            // alert(this.#chosenMap);
         }
         else {
             alert("Error! Wrong map number.");
-            this.chosenMap = "Error";
+            this.#chosenMap = "Error";
         }
     }
 
@@ -159,6 +155,9 @@ class BattleMap {
             }
         }
 
+        // console.log(`this ${this.#chosenMap} map: `);
+        // console.log(`${this.#gameBoard}`);
+
         //console.log("Gameboard post-fill:", this.#gameBoard);
     }
 
@@ -170,8 +169,7 @@ class BattleMap {
         for (let i = 0; i < this.#ships.length; i++) {
             battleMapJSON.push(this.#ships[i].toJSON());
         }
-        console.log("BattleMap toJSON: ");
-        console.log(JSON.stringify(battleMapJSON));
+
         return JSON.stringify(battleMapJSON);
     }
 
@@ -191,7 +189,11 @@ class BattleMap {
         console.log("hitting ID: " + id);
 
         const button = document.getElementById(id);
+        console.log(`This ${this.#chosenMap} map: `);
+        console.log(`${this.#gameBoard}`);
         if (this.#gameBoard[botXCoord][botYCoord] === 1) {
+            console.log("Map: ");
+            console.log(this.#gameBoard);
             button.style.background = "orange";
         }
         else {
@@ -268,11 +270,11 @@ class BattleMap {
                     this.#ships[i].setPieceLocation(j, xCoord, yCoord + j);
 
                     let newId;
-                    if (this.chosenMap === "mainCoords1") {
+                    if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "1" + xLetter + (yCoord + j).toString();
                     }
-                    else if (this.chosenMap === "mainCoords2") {
+                    else if (this.#chosenMap === "mainCoords2") {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "2" + xLetter + (yCoord + j).toString();
                     }
@@ -288,15 +290,15 @@ class BattleMap {
                     this.#ships[i].setPieceLocation(j, xCoord + j, yCoord);
 
                     let newId;
-                    if (this.chosenMap === "mainCoords1") {
+                    if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode(((xCoord + j) + 65));
                         newId = "1" + xLetter + yCoord.toString();
                     }
-                    else if (this.chosenMap === "mainCoords2") {
+                    else if (this.#chosenMap === "mainCoords2") {
                         xLetter = String.fromCharCode(((xCoord + j) + 65));
                         newId = "2" + xLetter + yCoord.toString();
                     }
-                    // console.log("new ID: " + newId);
+                     console.log("new ID: " + newId);
                     coordHTMLButton = document.getElementById(newId);
                     coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
@@ -308,11 +310,11 @@ class BattleMap {
                     this.#ships[i].setPieceLocation(j, xCoord, yCoord - j);
 
                     let newId;
-                    if (this.chosenMap === "mainCoords1") {
+                    if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "1" + xLetter + (yCoord - j).toString();
                     }
-                    else if (this.chosenMap === "mainCoords2") {
+                    else if (this.#chosenMap === "mainCoords2") {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "2" + xLetter + (yCoord - j).toString();
                     }
@@ -328,11 +330,11 @@ class BattleMap {
                     this.#ships[i].setPieceLocation(j, xCoord - j, yCoord);
 
                     let newId;
-                    if (this.chosenMap === "mainCoords1") {
+                    if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode(((xCoord - j) + 65));
                         newId = "1" + xLetter + yCoord.toString();
                     }
-                    else if (this.chosenMap === "mainCoords2") {
+                    else if (this.#chosenMap === "mainCoords2") {
                         xLetter = String.fromCharCode(((xCoord - j) + 65));
                         newId = "2" + xLetter + yCoord.toString();
                     }
@@ -458,7 +460,6 @@ class Piece {
         pieceJSON.push(JSON.stringify(this.#xCoord));
         pieceJSON.push(JSON.stringify(this.#yCoord));
         pieceJSON.push(JSON.stringify(this.#pieceNum));
-        console.log("Returning JSON from Piece object: " + JSON.stringify(pieceJSON));
         return JSON.stringify(pieceJSON);
     }
 
@@ -524,7 +525,6 @@ class Ship {
         }
         shipJSON.push(piecesStringArray);
 
-        console.log("Returning JSON from Ship object: " + JSON.stringify(shipJSON));
         return JSON.stringify(shipJSON); //Then returns the stringified version of the JSON string array
 
     }
