@@ -2,6 +2,7 @@ window.onload = function() {
     const callHTMLTurn = document.getElementById("showTurn");
     let map1;
     let map2;
+    let gameContinues = true;
 
     populateArrays();
 
@@ -22,9 +23,6 @@ window.onload = function() {
         localStorage.setItem("map1", map1.toJSON()); //And stores them in localStorage.
         localStorage.setItem("map2", map2.toJSON());
 
-        console.log("Trying to pull map 2!");
-        console.log(localStorage.getItem("map2"));
-
         let badCoords = []; //Sets up the badCoords array for both maps.
         // This is done here because the badCoords will always be empty when the maps are empty.
         localStorage.setItem("badCoords1", JSON.stringify(badCoords));
@@ -35,12 +33,11 @@ window.onload = function() {
         map1 = new BattleMap(1);
         map2 = new BattleMap(2);
 
-        map1.populateMapFromLocalStorage(savedGameState[0], 1);
-        map2.populateMapFromLocalStorage(savedGameState[1], 2);
+        map1.populateMapFromLocalStorage(savedGameState[0]);
+        map2.populateMapFromLocalStorage(savedGameState[1]);
     }
 
     callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
-
 
     const buttons = document.querySelectorAll(".boxElement");
     buttons.forEach(button => { //If any map button is clicked
@@ -51,18 +48,31 @@ window.onload = function() {
             }, 300); // Adjust duration as needed
 
             console.log(button.id);
-            if (button.id.charAt(0) === '2' && callPlayerTurn(button.id, map2)) { //Player can only perform map2 clicks.
+            if (gameContinues && button.id.charAt(0) === '2' && callPlayerTurn(button.id, map2)) { //Player can only perform map2 clicks.
                 //Bot turn uses map1, and player turn uses map2.
-                console.log("Valid turn");
                 //Calls the player turn as the condition. Condition returns false if it's a piece that's already been hit.
-                //TODO: Check win condition.
-                callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
-                callBotTurn(map1); //Bot goes immediately afterwards; simulates a full round (two turns).
-                //TODO: Finish Bot turn logic.
-                //TODO: Check win condition.
-                callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
-                localStorage.setItem("map1", map1.toJSON()); //Updates the localStorage of both maps.
-                localStorage.setItem("map2", map2.toJSON());
+                if (map2.isWinCondition()) { //Checks if all pieces are hit in map 2.
+                    alert("End of game: Player wins!");
+                    document.getElementById("showTurn").innerHTML = `<span> Player 1 Wins! </span>`;
+                    gameContinues = false;
+                    localStorage.clear();
+                }
+                else {
+                    callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
+                    callBotTurn(map1); //Bot goes immediately afterwards; simulates a full round (two turns).
+                    //TODO: Finish Bot turn logic.
+                    if (map1.isWinCondition()) {
+                        console.log("End of game: Bot wins!");
+                        document.getElementById("showTurn").innerHTML = `<span> Bot Wins! </span>`;
+                        gameContinues = false;
+                        localStorage.clear();
+                    }
+                    else {
+                        callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
+                        localStorage.setItem("map1", map1.toJSON()); //Updates the localStorage of both maps.
+                        localStorage.setItem("map2", map2.toJSON());
+                    }
+                }
             }
         });
 
@@ -77,7 +87,8 @@ window.onload = function() {
     const clearButton = document.querySelector("#clear");
     clearButton.addEventListener("click", () => { //Clear localStorage
         localStorage.clear();
-        alert("Cleared");
+        location.reload(); //Refreshes the page for new window.onload function
+        console.log("Reset");
     });
 };
 
@@ -131,8 +142,9 @@ class BattleMap {
         }
     }
 
-    populateMapFromLocalStorage(mapData, mapNum) { //Takes the given array from JSON.parse and populates the BattleMap class.
+    populateMapFromLocalStorage(mapData) { //Takes the given array from JSON.parse and populates the BattleMap class.
         mapData = deepParse(mapData);
+        let mapNum = this.#chosenMap.charAt(this.#chosenMap.length - 1);
 
         // Ensure we don't exceed the number of ships available
         for (let i = 0; i < Math.min(this.#ships.length, mapData.length); i++) {
@@ -234,7 +246,7 @@ class BattleMap {
             return true;
         }
         else { //Ship has already been hit
-            alert("Ship already hit!");
+            console.log("Cell already hit!");
             return false;
         }
         //TODO: Check win condition.
@@ -273,6 +285,20 @@ class BattleMap {
             badCoords.push(badCoord); //Adds missed coordinates
             localStorage.setItem("badCoords1", JSON.stringify(badCoords)); //Places back into localStorage.
         }
+    }
+
+    isWinCondition() {
+        let winConditionFound = true;
+        for (let i = 0; i < this.#ships.length; ++i) {
+            for (let j = 0; j < this.#ships[i].getLength(); ++j) {
+                if (!this.#ships[i].isPieceHit(j)) {
+                    //So if any of the pieces are not hit, then the win condition is false.
+                    winConditionFound = false;
+                }
+            }
+        }
+
+        return winConditionFound;
     }
 
     placeRandomShips() {

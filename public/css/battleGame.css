@@ -9,7 +9,6 @@ body {
 
 main {
     display: grid;
-    /*border: 1px solid black;*/
     grid-template-columns: 45% 45%;
     column-gap: 20px;
     justify-content: center;
@@ -17,22 +16,11 @@ main {
     height: 600px;
 }
 
-.gameContainer {
-    /*display: grid;*/
-    /*grid-template-rows: 5% 95%;*/
-    /*grid-template-columns: 10% 90%;*/
-    /*border: 1px solid black;*/
-    max-width: 100%;
-    /*padding: 20px;*/
-}
-
 div.mainCoords {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
-    /*border: 1px solid black;*/
     padding: 20px;
-    gap: 5px;
 }
 
 .boxElement {
