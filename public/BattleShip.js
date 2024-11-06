@@ -27,7 +27,6 @@ window.onload = function() {
         // This is done here because the badCoords will always be empty when the maps are empty.
         localStorage.setItem("badCoords1", JSON.stringify(badCoords));
         localStorage.setItem("badCoords2", JSON.stringify(badCoords));
-
     }
     else { //localStorage has something. Pull from localStorage.
         map1 = new BattleMap(1);
@@ -52,7 +51,7 @@ window.onload = function() {
                 //Bot turn uses map1, and player turn uses map2.
                 //Calls the player turn as the condition. Condition returns false if it's a piece that's already been hit.
                 if (map2.isWinCondition()) { //Checks if all pieces are hit in map 2.
-                    alert("End of game: Player wins!");
+                    console.log("End of game: Player wins!");
                     document.getElementById("showTurn").innerHTML = `<span> Player 1 Wins! </span>`;
                     gameContinues = false;
                     localStorage.clear();
@@ -76,10 +75,10 @@ window.onload = function() {
             }
         });
 
-        button.addEventListener("mouseover", () => {
+        button.addEventListener("mouseover", () => { //Simple mouseover effect.
             button.style.border = "5px solid red";
         });
-        button.addEventListener("mouseout", () => {
+        button.addEventListener("mouseout", () => { //Resets the button after the mouseover effect.
             button.style.border = "1px solid black"; // Reset the border when the mouse moves out
         });
     });
@@ -120,8 +119,15 @@ function populateArrays() {
 
 class BattleMap {
     #gameBoard;
+    //Contains a 2D array with values 0, 1, 2, 3
+    // 0 : Blank space
+    // 1 : Ship Exists
+    // 2 : Ship hit
+    // 3 : Missed shot
     #ships;
+    //Each ship contains an array of pieces, and the ship's length.
     #chosenMap;
+    //Is either mapCoords1 or mapCoords2. Should never be anything else.
 
     constructor(mapNum) {
         this.#gameBoard = Array.from({ length: 10 }, () => Array(10).fill(0)); //10x10 2D array.
@@ -221,7 +227,7 @@ class BattleMap {
             this.#gameBoard[xCoord][yCoord] = 2; //Hits piece.
             document.getElementById(id).style.backgroundColor = "orange";
 
-            for (let i = 0; i < this.#ships.length; ++i) {
+            for (let i = 0; i < this.#ships.length; ++i) { //Finds the corresponding piece in the ships object and hits it.
                 for (let j = 0; j < this.#ships[i].getLength(); ++j) {
                     if ((this.#ships[i].getPieceXCoord(j) === xCoord) && (this.#ships[i].getPieceYCoord(j) === yCoord)) {
                         this.#ships[i].hitPiece(j);
