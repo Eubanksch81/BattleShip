@@ -270,14 +270,22 @@ class BattleMap {
         if(plan !== null && plan[0] !== -1) {
             botXCoord = plan[0];
             botYCoord = plan[1];
-
         }
         else {
-            do {
-                botXCoord = Math.floor(Math.random() * 10);
-                botYCoord = Math.floor(Math.random() * 10);
-            } while (badCoords.some(coord => coord[0] === botXCoord && coord[1] === botYCoord));
-
+            let i = 0;
+            let found = false;
+            botXCoord = Math.floor(Math.random() * 10);
+            botYCoord = Math.floor(Math.random() * 10);
+            while(!found && i < badCoords.length) {
+                if (botXCoord === badCoords[i][0] && botYCoord === badCoords[i][1]) {
+                    found = true;
+                }
+            }
+            if(found){
+                badCoords.push(botXCoord,botYCoord);
+                localStorage.setItem("badCoords1", JSON.stringify(badCoords));
+                this.botTurn()
+            }
         }
 
         xLetter = String.fromCharCode((botXCoord + 65)); //A - J
@@ -307,11 +315,10 @@ class BattleMap {
             this.#gameBoard[botXCoord][botYCoord] = 3; //Marks piece as a miss.
             document.getElementById(id).style.backgroundColor = "pink";
 
-
             badCoords.push(botXCoord, botYCoord); //Adds missed coordinates
             localStorage.setItem("badCoords1", JSON.stringify(badCoords)); //Places back into localStorage.
-
         }
+
         else { //Ship has already been hit
             console.log("Repick choice");
             this.botTurn();
