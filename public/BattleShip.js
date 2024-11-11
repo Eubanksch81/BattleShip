@@ -255,42 +255,89 @@ class BattleMap {
             console.log("Cell already hit!");
             return false;
         }
-        //TODO: Check win condition.
     }
 
     botTurn() { //Plays the bot's turn against the player on board 1.
-        let botXCoord = Math.floor(Math.random() * 10); //0-9
-        let xLetter = String.fromCharCode((botXCoord + 65)); //A - J
-        let botYCoord = Math.floor(Math.random() * 10); //0-9
+        let plan;
+        let botXCoord;
+        let xLetter;
+        let botYCoord;
+        let id;
+        let badCoords = JSON.parse(localStorage.getItem("badCoords1")) || [];
+        plan = localStorage.getItem("plan");
+        plan = JSON.parse(plan) || null;
 
-        let id = "1" + xLetter + botYCoord.toString();
-        console.log("hitting ID: " + id);
+        if(plan !== null && plan[0] !== -1) {
+            botXCoord = plan[0];
+            botYCoord = plan[1];
 
-        const button = document.getElementById(id);
-        // console.log(`This ${this.#chosenMap} map: `);
-        // console.log(`${this.#gameBoard}`);
+        }
+        else {
+            do {
+                botXCoord = Math.floor(Math.random() * 10);
+                botYCoord = Math.floor(Math.random() * 10);
+            } while (badCoords.some(coord => coord[0] === botXCoord && coord[1] === botYCoord));
+
+        }
+
+        xLetter = String.fromCharCode((botXCoord + 65)); //A - J
+        id = "1" + xLetter + botYCoord.toString();
+        this.checkIfHit(botXCoord, botYCoord, id, badCoords);
+
+    }
+    checkIfHit(botXCoord, botYCoord, id, badCoords) {
+        let plan;
         if (this.#gameBoard[botXCoord][botYCoord] === 1) { //Hit
-            button.style.background = "orange";
 
-            for (let i = 0; i < this.#ships.length; ++i) { //Stores hit on map
+            this.#gameBoard[botXCoord][botYCoord] = 2; //Hits piece.
+            document.getElementById(id).style.backgroundColor = "orange";
+
+            for (let i = 0; i < this.#ships.length; ++i) { //Finds the corresponding piece in the ships object and hits it.
                 for (let j = 0; j < this.#ships[i].getLength(); ++j) {
                     if ((this.#ships[i].getPieceXCoord(j) === botXCoord) && (this.#ships[i].getPieceYCoord(j) === botYCoord)) {
                         this.#ships[i].hitPiece(j);
-                        console.log(`Bot Hit piece ${j} in ship ${i}`);
+                        plan = this.nextAttack(botXCoord, botYCoord);
+                        localStorage.setItem("plan", JSON.stringify(plan));
                     }
                 }
             }
         }
-        else {
-            button.style.background = "pink";
-            this.#gameBoard[botXCoord][botYCoord] = 3; //Marks piece as a miss.
+        else if (this.#gameBoard[botXCoord][botYCoord] === 0) {//Miss
 
-            let badCoord = [botXCoord, botYCoord]; //Takes missed coordinates
-            let badCoords = localStorage.getItem("badCoords1");
-            badCoords = JSON.parse(badCoords); //Pulls and parses badCoords array
-            badCoords.push(badCoord); //Adds missed coordinates
+            this.#gameBoard[botXCoord][botYCoord] = 3; //Marks piece as a miss.
+            document.getElementById(id).style.backgroundColor = "pink";
+
+
+            badCoords.push(botXCoord, botYCoord); //Adds missed coordinates
             localStorage.setItem("badCoords1", JSON.stringify(badCoords)); //Places back into localStorage.
+
         }
+        else { //Ship has already been hit
+            console.log("Repick choice");
+            this.botTurn();
+        }
+    }
+    nextAttack(botXCoord, botYCoord) {
+        let nextAttack;
+        const rows = this.#gameBoard.length;
+        const cols = this.#gameBoard[0].length;
+
+        if (botYCoord - 1 >= 0 && this.#gameBoard[botXCoord][botYCoord - 1] === 1) {
+            nextAttack = [botXCoord, botYCoord - 1];
+        }
+        else if (botXCoord - 1 >= 0 && this.#gameBoard[botXCoord - 1][botYCoord] === 1) {
+            nextAttack = [botXCoord - 1, botYCoord];
+        }
+        else if (botXCoord + 1 < rows && this.#gameBoard[botXCoord + 1][botYCoord] === 1) {
+            nextAttack = [botXCoord + 1, botYCoord];
+        }
+        else if (botYCoord + 1 < cols && this.#gameBoard[botXCoord][botYCoord + 1] === 1) {
+            nextAttack = [botXCoord, botYCoord + 1];
+        }
+        else {
+            nextAttack = [-1, -1];
+        }
+        return nextAttack;
     }
 
     isWinCondition() {
