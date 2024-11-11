@@ -263,7 +263,7 @@ class BattleMap {
         let xLetter;
         let botYCoord;
         let id;
-        let badCoords = JSON.parse(localStorage.getItem("badCoords1")) || [];
+        let badCoords = JSON.parse(localStorage.getItem("badCoords1"))|| [] ;
         plan = localStorage.getItem("plan");
         plan = JSON.parse(plan) || null;
 
@@ -280,11 +280,14 @@ class BattleMap {
                 if (botXCoord === badCoords[i][0] && botYCoord === badCoords[i][1]) {
                     found = true;
                 }
+                i++;
             }
             if(found){
-                badCoords.push(botXCoord,botYCoord);
+                let badCoord = [botXCoord, botYCoord];
+                badCoords.push(badCoord);
                 localStorage.setItem("badCoords1", JSON.stringify(badCoords));
                 this.botTurn()
+                return;
             }
         }
 
@@ -315,7 +318,8 @@ class BattleMap {
             this.#gameBoard[botXCoord][botYCoord] = 3; //Marks piece as a miss.
             document.getElementById(id).style.backgroundColor = "pink";
 
-            badCoords.push(botXCoord, botYCoord); //Adds missed coordinates
+            let badCoord = [botXCoord, botYCoord]
+            badCoords.push(badCoord); //Adds missed coordinates
             localStorage.setItem("badCoords1", JSON.stringify(badCoords)); //Places back into localStorage.
         }
 
