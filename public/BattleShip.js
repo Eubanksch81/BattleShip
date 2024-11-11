@@ -3,7 +3,7 @@ window.onload = function() {
     let map1;
     let map2;
     let gameContinues = true;
-
+    localStorage.clear();
     populateArrays();
 
     const savedGameState = [
@@ -263,7 +263,8 @@ class BattleMap {
         let xLetter;
         let botYCoord;
         let id;
-        let badCoords = JSON.parse(localStorage.getItem("badCoords1"))|| [] ;
+        let coordKey;
+        let badCoordsSet = new Set(JSON.parse(localStorage.getItem("badCoords1") || "[]"));
         plan = localStorage.getItem("plan");
         plan = JSON.parse(plan) || null;
 
@@ -271,33 +272,26 @@ class BattleMap {
             botXCoord = plan[0];
             botYCoord = plan[1];
         }
-        else {
-            let i = 0;
-            let found = false;
-            botXCoord = Math.floor(Math.random() * 10);
-            botYCoord = Math.floor(Math.random() * 10);
-            while(!found && i < badCoords.length) {
-                if (botXCoord === badCoords[i][0] && botYCoord === badCoords[i][1]) {
-                    found = true;
-                }
-                i++;
-            }
-            if(found){
-                let badCoord = [botXCoord, botYCoord];
-                badCoords.push(badCoord);
-                localStorage.setItem("badCoords1", JSON.stringify(badCoords));
-                this.botTurn()
-                return;
-            }
+        else { // Select random coordinates not in `badCoordsSet`
+            do {
+                botXCoord = Math.floor(Math.random() * 10);
+                botYCoord = Math.floor(Math.random() * 10);
+                coordKey = `${botXCoord},${botYCoord}`;
+            } while (badCoordsSet.has(coordKey));
+
+            // Add the chosen coordinate to `badCoordsSet` and update localStorage
+            badCoordsSet.add(coordKey);
+            localStorage.setItem("badCoords1", JSON.stringify(Array.from(badCoordsSet)));
         }
 
         xLetter = String.fromCharCode((botXCoord + 65)); //A - J
         id = "1" + xLetter + botYCoord.toString();
-        this.checkIfHit(botXCoord, botYCoord, id, badCoords);
+        this.checkIfHit(botXCoord, botYCoord, id, badCoordsSet);
 
     }
-    checkIfHit(botXCoord, botYCoord, id, badCoords) {
+    checkIfHit(botXCoord, botYCoord, id, badCoordsSet) {
         let plan;
+        let coordKey;
         if (this.#gameBoard[botXCoord][botYCoord] === 1) { //Hit
 
             this.#gameBoard[botXCoord][botYCoord] = 2; //Hits piece.
@@ -317,10 +311,9 @@ class BattleMap {
 
             this.#gameBoard[botXCoord][botYCoord] = 3; //Marks piece as a miss.
             document.getElementById(id).style.backgroundColor = "pink";
-
-            let badCoord = [botXCoord, botYCoord]
-            badCoords.push(badCoord); //Adds missed coordinates
-            localStorage.setItem("badCoords1", JSON.stringify(badCoords)); //Places back into localStorage.
+            coordKey = `${botXCoord},${botYCoord}`;
+            badCoordsSet.add(coordKey);
+            localStorage.setItem("badCoords1", JSON.stringify(Array.from(badCoordsSet)));
         }
 
         else { //Ship has already been hit
