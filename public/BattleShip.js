@@ -3,7 +3,7 @@ window.onload = function() {
     let map1;
     let map2;
     let gameContinues = true;
-    localStorage.clear();
+    // localStorage.clear();
     populateArrays();
 
     const savedGameState = [
@@ -59,7 +59,6 @@ window.onload = function() {
                 else {
                     callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
                     callBotTurn(map1); //Bot goes immediately afterwards; simulates a full round (two turns).
-                    //TODO: Finish Bot turn logic.
                     if (map1.isWinCondition()) {
                         console.log("End of game: Bot wins!");
                         document.getElementById("showTurn").innerHTML = `<span> Bot Wins! </span>`;
@@ -177,7 +176,9 @@ class BattleMap {
                     }
                     else {
                         this.#gameBoard[xCoord][yCoord] = 1;
-                        newButton.style.backgroundColor = "maroon";
+                        if (mapNum === "1") { //TODO: Error here. Won't load first map.
+                            newButton.style.backgroundColor = "maroon";
+                        }
                     }
                 }
             }
@@ -276,7 +277,8 @@ class BattleMap {
             do {
                 botXCoord = Math.floor(Math.random() * 10);
                 botYCoord = Math.floor(Math.random() * 10);
-                coordKey = `${botXCoord},${botYCoord}`;
+                // coordKey = `${botXCoord},${botYCoord}`;
+                coordKey = [botXCoord, botYCoord];
             } while (badCoordsSet.has(coordKey));
 
             // Add the chosen coordinate to `badCoordsSet` and update localStorage
@@ -311,7 +313,8 @@ class BattleMap {
 
             this.#gameBoard[botXCoord][botYCoord] = 3; //Marks piece as a miss.
             document.getElementById(id).style.backgroundColor = "pink";
-            coordKey = `${botXCoord},${botYCoord}`;
+            // coordKey = `${botXCoord},${botYCoord}`;
+            coordKey = [botXCoord, botYCoord];
             badCoordsSet.add(coordKey);
             localStorage.setItem("badCoords1", JSON.stringify(Array.from(badCoordsSet)));
         }
@@ -407,13 +410,9 @@ class BattleMap {
                     if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "1" + xLetter + (yCoord + j).toString();
+                        coordHTMLButton = document.getElementById(newId);
+                        coordHTMLButton.style.backgroundColor = "maroon";
                     }
-                    else if (this.#chosenMap === "mainCoords2") {
-                        xLetter = String.fromCharCode((xCoord + 65));
-                        newId = "2" + xLetter + (yCoord + j).toString();
-                    }
-                    coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
@@ -426,13 +425,9 @@ class BattleMap {
                     if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode(((xCoord + j) + 65));
                         newId = "1" + xLetter + yCoord.toString();
+                        coordHTMLButton = document.getElementById(newId);
+                        coordHTMLButton.style.backgroundColor = "maroon";
                     }
-                    else if (this.#chosenMap === "mainCoords2") {
-                        xLetter = String.fromCharCode(((xCoord + j) + 65));
-                        newId = "2" + xLetter + yCoord.toString();
-                    }
-                    coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
@@ -445,13 +440,9 @@ class BattleMap {
                     if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode((xCoord + 65));
                         newId = "1" + xLetter + (yCoord - j).toString();
+                        coordHTMLButton = document.getElementById(newId);
+                        coordHTMLButton.style.backgroundColor = "maroon";
                     }
-                    else if (this.#chosenMap === "mainCoords2") {
-                        xLetter = String.fromCharCode((xCoord + 65));
-                        newId = "2" + xLetter + (yCoord - j).toString();
-                    }
-                    coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
@@ -464,13 +455,9 @@ class BattleMap {
                     if (this.#chosenMap === "mainCoords1") {
                         xLetter = String.fromCharCode(((xCoord - j) + 65));
                         newId = "1" + xLetter + yCoord.toString();
+                        coordHTMLButton = document.getElementById(newId);
+                        coordHTMLButton.style.backgroundColor = "maroon";
                     }
-                    else if (this.#chosenMap === "mainCoords2") {
-                        xLetter = String.fromCharCode(((xCoord - j) + 65));
-                        newId = "2" + xLetter + yCoord.toString();
-                    }
-                    coordHTMLButton = document.getElementById(newId);
-                    coordHTMLButton.style.backgroundColor = "maroon";
                     //We need to update the ID for the buttons as we go, in order to change them to red.
                 }
             }
