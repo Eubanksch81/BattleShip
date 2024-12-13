@@ -23,6 +23,40 @@ const db = new sqlite3.Database('./DataBase/UserLoginBattleShip.db', (err) => {
     console.log('Connected to the SQLite database.');
 });
 
+app.post('/BattleShip/public/createLogin', (req, res) => {
+    const { username, password } = req.body;
+
+    // Query the database to find the user with matching credentials
+    db.get(
+        'SELECT * FROM user_login WHERE username = ? COLLATE NOCASE',
+        [username],
+        (err, row) => {
+            if (err) {
+                console.error('Database error:', err.message);
+                return res.status(500).json({ success: false, message: 'An error occurred. Please try again.' });
+            }
+
+            console.log('Query result:', row);  // Debugging line
+
+            if (row) {
+                // Username already exists
+                return res.json({ success: false, message: 'Username already taken.' });
+            }
+
+            // Insert the new user if username doesn't exist
+            const sql = 'INSERT INTO user_login (username, password) VALUES (?, ?)';
+            db.run(sql, [username, password], function(err) {
+                if (err) {
+                    console.error('Error inserting data:', err.message);
+                    return res.status(500).json({ success: false, message: 'Failed to create account.' });
+                }
+
+                return res.json({ success: true, message: 'Account created successfully!' });
+            });
+        }
+    );
+});
+
 // Route to handle login
 app.post('/BattleShip/public/login', (req, res) => {
     const { username, password } = req.body;

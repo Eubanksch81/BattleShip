@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BattleShip Login</title>
     <link rel="stylesheet" href="css/create_login.css">
 </head>
@@ -17,8 +18,8 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="input-group">
-                <label class="boxText" for="reenterpassword">Confirm Password:</label>
-                <input type="password" id="reenterpassword" name="reenterpassword" required>
+                <label class="boxText" for="reEnterPassword">Confirm Password:</label>
+                <input type="password" id="reEnterPassword" name="reEnterPassword" required>
             </div>
             <div class="actions">
                 <a href="login.html">Login Page</a>
@@ -27,5 +28,7 @@
             <button id="submitButton" type="submit"><b>Create Account</b></button>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="createUser.js"></script>
 </body>
 </html>
