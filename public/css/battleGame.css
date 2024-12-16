@@ -13,7 +13,7 @@ main {
     column-gap: 20px;
     justify-content: center;
     margin-top: 50px;
-    height: 600px;
+    height: 500px;
 }
 
 div.mainCoords {
@@ -42,7 +42,7 @@ div.mainCoords {
 
 button#start {
     border: 0;
-    padding: 20px 40px 20px 40px;
+    padding: 20px 0px 20px 0px;
     background-color: darkslateblue;
     color: white;
 }
