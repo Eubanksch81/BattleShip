@@ -1,12 +1,29 @@
 // loginPage.js
 document.addEventListener('DOMContentLoaded', function(){
-    document.getElementById('check').addEventListener('click', function(){
-        
-    });
-    if(remeberMe){
-        const userName = JSON.parse(localStorage.getItem("username"));
-        const password = JSON.parse(localStorage.getItem("Password"));
+    console.log(localStorage.getItem("check"));
+    if (JSON.parse(localStorage.getItem("check")) === null || JSON.parse(localStorage.getItem("check")) === false) {
+        console.log("not checked!");
     }
+    else if (JSON.parse(localStorage.getItem("check")) === true) {
+        const ele = document.getElementById("check");
+        ele.checked = true;
+        document.getElementById("username").value = JSON.parse(localStorage.getItem("username"));
+        document.getElementById("password").value = JSON.parse(localStorage.getItem("password"));
+    }
+    document.getElementById('check').addEventListener('click', function(){
+        const ele = document.getElementById('check');
+        console.log(ele.checked);
+        if (ele.checked) {
+            localStorage.setItem("username", JSON.stringify(document.getElementById("username").value));
+            localStorage.setItem("password", JSON.stringify(document.getElementById("password").value));
+            localStorage.setItem("check", JSON.stringify(ele.checked));
+        }
+        else if (!ele.checked) {
+            localStorage.removeItem("username");
+            localStorage.removeItem("password");
+            localStorage.setItem("check", JSON.stringify(ele.checked));
+        }
+    });
     // Function to handle form submission
     document.getElementById('loginForm').addEventListener('submit', async function (event) {
         event.preventDefault(); // Prevent the default form submission
