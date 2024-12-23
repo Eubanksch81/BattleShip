@@ -79,6 +79,26 @@ app.post('/BattleShip/public/login', (req, res) => {
     );
 });
 
+app.post('/BattleShip/public/BattleShipGame', (req, res) => {
+    const {wins, losses, username} = req.body;
+    db.get(
+        'UPDATE player_stats SET wins = ?, losses = ? WHERE username = ?',
+        [wins, losses, username],
+        (err, row) => {
+            if (err) {
+                console.error('Database error:', err.message);
+                return res.status(500).json({ success: false, message: 'An error occurred. Please try again.' });
+            }
+
+            if (row) {
+                // Username already exists
+                return res.json({ success: false, message: 'Updated successfully' });
+            }
+        }
+    );
+
+});
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

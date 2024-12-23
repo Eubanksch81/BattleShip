@@ -1,25 +1,17 @@
+import {getUsername} from '../public/loginPage.js';
 window.onload = function() {
     const callHTMLTurn = document.getElementById("showTurn");
     let map1;
-    let map2;
-    let winStat;
-    let lossStat;
+    let map2
     let gameContinues = true;
     populateArrays();
-
+    const username = getUsername();
+    console.log(username);
     const savedGameState = [
-        JSON.parse(localStorage.getItem("map1")), //Sucessfully stored and retrieved the items using localStorage!
+        JSON.parse(localStorage.getItem("map1")), //Successfully stored and retrieved the items using localStorage!
         JSON.parse(localStorage.getItem("map2"))
     ]; //Gets map1 and map2 from localStorage.
 
-    if (localStorage.getItem("wins") === null || localStorage.getItem("losses") === null) {
-        winStat = 0;
-        lossStat = 0;
-    }
-    else {
-        winStat = localStorage.getItem("wins");
-        lossStat = localStorage.getItem("loss");
-    }
 
     console.log(savedGameState[0]);
     console.log(savedGameState[1]);
@@ -50,7 +42,7 @@ window.onload = function() {
 
     const buttons = document.querySelectorAll(".boxElement");
     buttons.forEach(button => { //If any map button is clicked
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
             button.classList.add('flash'); //Adds a neat flashing effect when the button is clicked.
             setTimeout(() => {
                 button.classList.remove('flash');
@@ -64,14 +56,29 @@ window.onload = function() {
                     console.log("End of game: Player wins!");
                     document.getElementById("showTurn").innerHTML = `<span> Player 1 Wins! </span>`;
                     gameContinues = false;
+
                     localStorage.removeItem("map1");
                     localStorage.removeItem("map2");
                     localStorage.removeItem("badCoords1");
                     localStorage.removeItem("badCoords2");
                     localStorage.removeItem("plan");
-                    //TODO: Add a case for a win and a loss, that increments the wins and losses onto the database.
-                }
-                else {
+                    try {
+                        const response = await axios.post('http://localhost:3000/BattleShip/public/BattleShipGame', {
+                            wins: 1,
+                            losses: 0,
+                            username
+                        });
+                        if (response.data.success) {
+                            // Redirect to the game page or success page
+                           console.log(response.data.message);
+                        } else {
+                            // Show error message
+                            console.log(response.data.message);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                } else {
                     callHTMLTurn.innerHTML = `<span> Bot Turn! </span>`;
                     callBotTurn(map1); //Bot goes immediately afterwards; simulates a full round (two turns).
                     if (map1.isWinCondition()) {
@@ -83,8 +90,23 @@ window.onload = function() {
                         localStorage.removeItem("badCoords1");
                         localStorage.removeItem("badCoords2");
                         localStorage.removeItem("plan");
-                    }
-                    else {
+                        try {
+                            const response = await axios.post('http://localhost:3000/BattleShip/public/BattleShipGame', {
+                                wins: 0,
+                                losses: 1,
+                                username
+                            });
+                            if (response.data.success) {
+                                // Redirect to the game page or success page
+                                console.log(response.data.message);
+                            } else {
+                                // Show error message
+                                console.log(response.data.message);
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                        }
+                    } else {
                         callHTMLTurn.innerHTML = `<span> Player 1 Turn! </span>`;
                         localStorage.setItem("map1", map1.toJSON()); //Updates the localStorage of both maps.
                         localStorage.setItem("map2", map2.toJSON());
